@@ -5,6 +5,7 @@
 import requests
 import datetime
 import json
+import time
 from httpsig.requests_auth import HTTPSignatureAuth
 from concurrent.futures import ThreadPoolExecutor
 
@@ -44,6 +45,7 @@ def get_user_info(host, auth):
     headers['Date'] = datetime.datetime.utcnow().strftime(GMT_FORM)
     response = requests.get(url, auth=auth, headers=headers, timeout=120)
     users = json.loads(response.text)
+    # print(users)
     user_ids = []
     for user in users:
         if user["username"] != "admin":
@@ -92,7 +94,7 @@ def get_assets_node_info(host, auth):
 def get_assets_system_users(host, auth):
     url = host + '/api/v1/assets/system-users/'
     headers['Date'] = datetime.datetime.utcnow().strftime(GMT_FORM)
-    response = requests.get(url, auth=auth, headers=headers, timeout=120)
+    response = requests.get(url, auth=auth, headers=headers, timeout=240)
     nodes = json.loads(response.text)
     node_ids = []
     for node in nodes:
@@ -104,10 +106,14 @@ def get_assets_system_users(host, auth):
 
 
 # 获取资产授权
-def get_assets_permissions(host, auth):
-    url = host + '/api/v1/perms/asset-permissions/'
+def get_assets_permissions(host, auth, asset_id=None):
+    if asset_id == None:
+        url = host + '/api/v1/perms/asset-permissions/'
+    else:
+        url = host + '/api/v1/perms/asset-permissions/' + '?asset_id=' + asset_id
     headers['Date'] = datetime.datetime.utcnow().strftime(GMT_FORM)
     response = requests.get(url, auth=auth, headers=headers, timeout=1200)
+    # print(response.text)
     permissions = json.loads(response.text)
     permission_ids = []
     for permission in permissions:
@@ -213,7 +219,15 @@ def delete_all(host, auth, workers=None):
 
 if __name__ == "__main__":
     host = "http://10.1.12.166"
-    AccessKey = '5d610375-a1bc-47e9-98ac-f5ed1805138a'
-    SecretKey = '5839f7b5-523c-4f84-bda9-0835195afc4a'
+    AccessKey = '172e3f6c-192a-46c2-aa7c-11919d784e43'
+    SecretKey = '39deb43f-3500-40e0-9f5d-e15788419f9e'
+    # host = "http://democenter.fit2cloud.com:10888/"
+    # AccessKey = '5911c540-d6ee-4990-ada0-b2ef9e6a6c78'
+    # SecretKey = '698b19a0-74ef-4d18-814c-8c2a0e9a2794'
     auth = get_auth(AccessKey, SecretKey)
     delete_all(host, auth)
+    # get_user_info(host, auth)
+    # start_time = time.time()
+    # get_assets_permissions(host, auth, asset_id="4c801e93-2a4c-45c3-8413-b9cf902e8413")
+    # total_time = time.time() - start_time
+    # print(total_time)

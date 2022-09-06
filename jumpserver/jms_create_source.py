@@ -62,7 +62,7 @@ if __name__ == "__main__":
     print(start_time)
     futures = []
     with ThreadPoolExecutor(max_workers=13) as executor:
-        for _ in range(10000):
+        for _ in range(400):
             executor.submit(create_user,host,auth)
 
     total_time = time.time() - start_time
